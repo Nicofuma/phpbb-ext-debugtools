@@ -1,0 +1,8 @@
+services:
+    nicofuma.debugtools.console.command.cache.show:
+        class: nicofuma\debugtools\console\command\cache\show
+        arguments:
+            - @user
+            - @cache.driver
+        tags:
+            - { name: console.command }
