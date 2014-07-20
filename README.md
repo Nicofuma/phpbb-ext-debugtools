@@ -1,4 +1,4 @@
-WebProfilerExtension
+Debug Tools
 ==================
 
 ## Installation
