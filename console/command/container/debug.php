@@ -58,17 +58,17 @@ class debug extends \phpbb\console\command\command
 	/**
 	* Constructor
 	*
-	* @param \phpbb\user            $user            User instance
-	* @param \phpbb\config_php_file $config_php_file
-	* @param string                 $phpbb_root_path Path to the phpbb includes directory.
-	* @param string                 $php_ext         php file extension
+	* @param \phpbb\user			$user				User instance
+	* @param \phpbb\config_php_file	$config_php_file
+	* @param string					$phpbb_root_path	Path to the phpbb includes directory.
+	* @param string					$php_ext			php file extension
 	*/
 	function __construct(\phpbb\user $user, \phpbb\config_php_file $config_php_file, $phpbb_root_path, $php_ext)
 	{
-		$this->config_php_file = $config_php_file;
-		$this->phpbb_root_path = $phpbb_root_path;
-		$this->php_ext         = $php_ext;
-		$this->user            = $user;
+		$this->config_php_file	= $config_php_file;
+		$this->phpbb_root_path	= $phpbb_root_path;
+		$this->php_ext			= $php_ext;
+		$this->user				= $user;
 
 		$user->add_lang_ext('nicofuma/debugtools', 'cli');
 
@@ -199,9 +199,9 @@ class debug extends \phpbb\console\command\command
 		$output->writeln($this->getHelper('formatter')->formatSection('container', $label));
 
 		// loop through to get space needed and filter private services
-		$maxName  = 4;
-		$maxScope = 6;
-		$maxTags  = array();
+		$maxName	= 4;
+		$maxScope	= 6;
+		$maxTags	= array();
 		foreach ($serviceIds as $key => $serviceId)
 		{
 			$definition = $this->resolveServiceDefinition($serviceId);
@@ -424,10 +424,10 @@ class debug extends \phpbb\console\command\command
 	{
 		$output->writeln($this->getHelper('formatter')->formatSection('container', $this->user->lang('LIST_PARAMETERS')));
 
-		$terminalDimensions = $this->getApplication()->getTerminalDimensions();
-		$maxTerminalWidth   = $terminalDimensions[0];
-		$maxParameterWidth  = 0;
-		$maxValueWidth      = 0;
+		$terminalDimensions	= $this->getApplication()->getTerminalDimensions();
+		$maxTerminalWidth	= $terminalDimensions[0];
+		$maxParameterWidth	= 0;
+		$maxValueWidth		= 0;
 
 		// Determine max parameter & value length
 		foreach ($parameters as $parameter => $value)
@@ -447,8 +447,8 @@ class debug extends \phpbb\console\command\command
 
 		$maxValueWidth = min($maxValueWidth, $maxTerminalWidth - $maxParameterWidth - 1);
 
-		$formatTitle = '%-' . ($maxParameterWidth + 19) . 's %-' . ($maxValueWidth + 19) . 's';
-		$format      = '%-' . $maxParameterWidth . 's %-' . $maxValueWidth . 's';
+		$formatTitle	= '%-' . ($maxParameterWidth + 19) . 's %-' . ($maxValueWidth + 19) . 's';
+		$format			= '%-' . $maxParameterWidth . 's %-' . $maxValueWidth . 's';
 
 		$output->writeln(sprintf($formatTitle, '<comment>' . $this->user->lang('PARAMETER') . '</comment>', '<comment>' . $this->user->lang('VALUE') . '</comment>'));
 
@@ -534,8 +534,8 @@ class debug extends \phpbb\console\command\command
 	/**
 	* Renders list of tagged services grouped by tag
 	*
-	* @param OutputInterface $output
-	* @param bool            $showPrivate
+	* @param OutputInterface	$output
+	* @param bool				$showPrivate
 	*/
 	protected function outputTags(OutputInterface $output, $showPrivate = false)
 	{

@@ -16,3 +16,11 @@ services:
             - %core.php_ext%
         tags:
             - { name: console.command }
+
+    nicofuma.debugtools.console.command.router.debug:
+        class: nicofuma\debugtools\console\command\router\debug
+        arguments:
+            - @user
+            - @controller.provider
+        tags:
+            - { name: console.command }
