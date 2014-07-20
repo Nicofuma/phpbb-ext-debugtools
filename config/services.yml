@@ -6,3 +6,13 @@ services:
             - @cache.driver
         tags:
             - { name: console.command }
+
+    nicofuma.debugtools.console.command.container.debug:
+        class: nicofuma\debugtools\console\command\container\debug
+        arguments:
+            - @user
+            - @config.php
+            - %core.root_path%
+            - %core.php_ext%
+        tags:
+            - { name: console.command }
