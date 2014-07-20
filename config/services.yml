@@ -1,6 +1,6 @@
 services:
-    nicofuma.debugtools.console.command.cache.show:
-        class: nicofuma\debugtools\console\command\cache\show
+    nicofuma.debugtools.console.command.cache.get:
+        class: nicofuma\debugtools\console\command\cache\get
         arguments:
             - @user
             - @cache.driver

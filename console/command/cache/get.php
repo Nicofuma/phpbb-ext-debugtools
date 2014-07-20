@@ -16,7 +16,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 
-class show extends \phpbb\console\command\command
+class get extends \phpbb\console\command\command
 {
 	/** @var \phpbb\cache\driver\driver_interface */
 	protected $cache;
@@ -56,7 +56,7 @@ class show extends \phpbb\console\command\command
 	}
 
 	/**
-	* Executes the command cache:show.
+	* Executes the command cache:get.
 	*
 	* Display the information available about a cached value.
 	*
