@@ -5,7 +5,7 @@
 *
 * @copyright (c) phpBB Limited <https://www.phpbb.com>
 * @copyright (c) Fabien Potencier <fabien@symfony.com>
-* @license GNU General Public License, version 2 (GPL-2.0)
+* @license       GNU General Public License, version 2 (GPL-2.0)
 *
 * For full copyright and license information, please see
 * the docs/CREDITS.txt file.
@@ -21,6 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
 * A console command for retrieving information about services
@@ -57,17 +58,17 @@ class debug extends \phpbb\console\command\command
 	/**
 	* Constructor
 	*
-	* @param \phpbb\user			$user				User instance
-	* @param \phpbb\config_php_file	$config_php_file
-	* @param string 				$phpbb_root_path	Path to the phpbb includes directory.
-	* @param string 				$php_ext			php file extension
+	* @param \phpbb\user            $user            User instance
+	* @param \phpbb\config_php_file $config_php_file
+	* @param string                 $phpbb_root_path Path to the phpbb includes directory.
+	* @param string                 $php_ext         php file extension
 	*/
 	function __construct(\phpbb\user $user, \phpbb\config_php_file $config_php_file, $phpbb_root_path, $php_ext)
 	{
 		$this->config_php_file = $config_php_file;
 		$this->phpbb_root_path = $phpbb_root_path;
-		$this->php_ext = $php_ext;
-		$this->user = $user;
+		$this->php_ext         = $php_ext;
+		$this->user            = $user;
 
 		$user->add_lang_ext('nicofuma/debugtools', 'cli');
 
@@ -82,46 +83,15 @@ class debug extends \phpbb\console\command\command
 		$this
 			->setName('container:debug')
 			->setDefinition(array(
-				new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
-				new InputOption('show-private', null, InputOption::VALUE_NONE, 'Use to show public *and* private services'),
-				new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Show all services with a specific tag'),
-				new InputOption('tags', null, InputOption::VALUE_NONE, 'Displays tagged services for an application'),
-				new InputOption('parameter', null, InputOption::VALUE_REQUIRED, 'Displays a specific parameter for an application'),
-				new InputOption('parameters', null, InputOption::VALUE_NONE, 'Displays parameters for an application')
+				new InputArgument('name', InputArgument::OPTIONAL, $this->user->lang('NICOFUMA_DEBUGTOOLS_CLI_ARGUMENT_SERVICE_NAME')),
+				new InputOption('show-private', null, InputOption::VALUE_NONE, $this->user->lang('NICOFUMA_DEBUGTOOLS_CLI_OPTION_CONTAINER_SHOW_PRIVATE')),
+				new InputOption('tag', null, InputOption::VALUE_REQUIRED, $this->user->lang('NICOFUMA_DEBUGTOOLS_CLI_OPTION_CONTAINER_TAG')),
+				new InputOption('tags', null, InputOption::VALUE_NONE, $this->user->lang('NICOFUMA_DEBUGTOOLS_CLI_OPTION_CONTAINER_TAGS')),
+				new InputOption('parameter', null, InputOption::VALUE_REQUIRED, $this->user->lang('NICOFUMA_DEBUGTOOLS_CLI_OPTION_CONTAINER_PARAMETER')),
+				new InputOption('parameters', null, InputOption::VALUE_NONE, $this->user->lang('NICOFUMA_DEBUGTOOLS_CLI_OPTION_CONTAINER_PARAMETERS'))
 			))
-			->setDescription('Displays current services for an application')
-			->setHelp(<<<EOF
-The <info>%command.name%</info> command displays all configured <comment>public</comment> services:
-
-  <info>php %command.full_name%</info>
-
-To get specific information about a service, specify its name:
-
-  <info>php %command.full_name% validator</info>
-
-By default, private services are hidden. You can display all services by
-using the --show-private flag:
-
-  <info>php %command.full_name% --show-private</info>
-
-Use the --tags option to display tagged <comment>public</comment> services grouped by tag:
-
-  <info>php %command.full_name% --tags</info>
-
-Find all services with a specific tag by specifying the tag name with the --tag option:
-
-  <info>php %command.full_name% --tag=form.type</info>
-
-Use the --parameters option to display all parameters:
-
-  <info>php %command.full_name% --parameters</info>
-
-Display a specific parameter by specifying his name with the --parameter option:
-
-  <info>php %command.full_name% --parameter=kernel.debug</info>
-EOF
-			)
-		;
+			->setDescription($this->user->lang('NICOFUMA_DEBUGTOOLS_CLI_DESCRIPTION_CONTAINER_DEBUG'))
+			->setHelp($this->user->lang('NICOFUMA_DEBUGTOOLS_CLI_HELP_CONTAINER_DEBUG'));
 	}
 
 	/**
@@ -135,7 +105,8 @@ EOF
 
 		$this->containerBuilder = $this->getContainerBuilder();
 
-		if ($input->getOption('parameters')) {
+		if ($input->getOption('parameters'))
+		{
 			$parameters = $this->getContainerBuilder()->getParameterBag()->all();
 
 			// Sort parameters alphabetically
@@ -147,22 +118,27 @@ EOF
 		}
 
 		$parameter = $input->getOption('parameter');
-		if (null !== $parameter) {
+		if (null !== $parameter)
+		{
 			$output->write($this->formatParameter($this->getContainerBuilder()->getParameter($parameter)));
 
 			return;
 		}
 
-		if ($input->getOption('tags')) {
+		if ($input->getOption('tags'))
+		{
 			$this->outputTags($output, $input->getOption('show-private'));
 
 			return;
 		}
 
 		$tag = $input->getOption('tag');
-		if (null !== $tag) {
+		if (null !== $tag)
+		{
 			$serviceIds = array_keys($this->containerBuilder->findTaggedServiceIds($tag));
-		} else {
+		}
+		else
+		{
 			$serviceIds = $this->containerBuilder->getServiceIds();
 		}
 
@@ -170,9 +146,12 @@ EOF
 		asort($serviceIds);
 
 		$name = $input->getArgument('name');
-		if ($name) {
+		if ($name)
+		{
 			$this->outputService($output, $name);
-		} else {
+		}
+		else
+		{
 			$this->outputServices($output, $serviceIds, $input->getOption('show-private'), $tag);
 		}
 	}
@@ -182,60 +161,78 @@ EOF
 		$options = array('tags', 'tag', 'parameters', 'parameter');
 
 		$optionsCount = 0;
-		foreach ($options as $option) {
-			if ($input->getOption($option)) {
+		foreach ($options as $option)
+		{
+			if ($input->getOption($option))
+			{
 				$optionsCount++;
 			}
 		}
 
 		$name = $input->getArgument('name');
-		if ((null !== $name) && ($optionsCount > 0)) {
-			throw new \InvalidArgumentException('The options tags, tag, parameters & parameter can not be combined with the service name argument.');
-		} elseif ((null === $name) && $optionsCount > 1) {
-			throw new \InvalidArgumentException('The options tags, tag, parameters & parameter can not be combined together.');
+		if ((null !== $name) && ($optionsCount > 0))
+		{
+			throw new \InvalidArgumentException($this->user->lang('NICOFUMA_DEBUGTOOLS_CLI_EXCEPTION_CONTAINER_DEBUG_INCOMPATIBLE_OPTIONS_ARGUMENTS'));
+		}
+		elseif ((null === $name) && $optionsCount > 1)
+		{
+			throw new \InvalidArgumentException($this->user->lang('NICOFUMA_DEBUGTOOLS_CLI_EXCEPTION_CONTAINER_DEBUG_INCOMPATIBLE_OPTIONS'));
 		}
 	}
 
 	protected function outputServices(OutputInterface $output, $serviceIds, $showPrivate = false, $showTagAttributes = null)
 	{
 		// set the label to specify public or public+private
-		if ($showPrivate) {
-			$label = '<comment>Public</comment> and <comment>private</comment> services';
-		} else {
-			$label = '<comment>Public</comment> services';
+		if ($showPrivate)
+		{
+			$label = $this->user->lang('NICOFUME_DEBUGTOOLS_CLI_CONTAINER_PUBLIC_PRIVATE_SERVICES');
 		}
-		if ($showTagAttributes) {
-			$label .= ' with tag <info>'.$showTagAttributes.'</info>';
+		else
+		{
+			$label = $this->user->lang('NICOFUME_DEBUGTOOLS_CLI_CONTAINER_PUBLIC_SERVICES');
+		}
+		if ($showTagAttributes)
+		{
+			$label .= $this->user->lang('NICOFUME_DEBUGTOOLS_CLI_CONTAINER_LABEL_TAG', $showTagAttributes);
 		}
 
 		$output->writeln($this->getHelper('formatter')->formatSection('container', $label));
 
 		// loop through to get space needed and filter private services
-		$maxName = 4;
+		$maxName  = 4;
 		$maxScope = 6;
-		$maxTags = array();
-		foreach ($serviceIds as $key => $serviceId) {
+		$maxTags  = array();
+		foreach ($serviceIds as $key => $serviceId)
+		{
 			$definition = $this->resolveServiceDefinition($serviceId);
 
-			if ($definition instanceof Definition) {
+			if ($definition instanceof Definition)
+			{
 				// filter out private services unless shown explicitly
-				if (!$showPrivate && !$definition->isPublic()) {
+				if (!$showPrivate && !$definition->isPublic())
+				{
 					unset($serviceIds[$key]);
 					continue;
 				}
 
-				if (strlen($definition->getScope()) > $maxScope) {
+				if (strlen($definition->getScope()) > $maxScope)
+				{
 					$maxScope = strlen($definition->getScope());
 				}
 
-				if (null !== $showTagAttributes) {
+				if (null !== $showTagAttributes)
+				{
 					$tags = $definition->getTag($showTagAttributes);
-					foreach ($tags as $tag) {
-						foreach ($tag as $key => $value) {
-							if (!isset($maxTags[$key])) {
+					foreach ($tags as $tag)
+					{
+						foreach ($tag as $key => $value)
+						{
+							if (!isset($maxTags[$key]))
+							{
 								$maxTags[$key] = strlen($key);
 							}
-							if (strlen($value) > $maxTags[$key]) {
+							if (strlen($value) > $maxTags[$key])
+							{
 								$maxTags[$key] = strlen($value);
 							}
 						}
@@ -243,53 +240,76 @@ EOF
 				}
 			}
 
-			if (strlen($serviceId) > $maxName) {
+			if (strlen($serviceId) > $maxName)
+			{
 				$maxName = strlen($serviceId);
 			}
 		}
-		$format = '%-'.$maxName.'s ';
-		$format .= implode("", array_map(function ($length) { return "%-{$length}s "; }, $maxTags));
-		$format .= '%-'.$maxScope.'s %s';
+		$format = '%-' . $maxName . 's ';
+		$format .= implode("", array_map(function ($length)
+		{
+			return "%-{$length}s ";
+		}, $maxTags));
+		$format .= '%-' . $maxScope . 's %s';
 
 		// the title field needs extra space to make up for comment tags
-		$format1 = '%-'.($maxName + 19).'s ';
-		$format1 .= implode("", array_map(function ($length) { return '%-'.($length + 19).'s '; }, $maxTags));
-		$format1 .= '%-'.($maxScope + 19).'s %s';
+		$format1 = '%-' . ($maxName + 19) . 's ';
+		$format1 .= implode("", array_map(function ($length)
+		{
+			return '%-' . ($length + 19) . 's ';
+		}, $maxTags));
+		$format1 .= '%-' . ($maxScope + 19) . 's %s';
 
 		$tags = array();
-		foreach ($maxTags as $tagName => $length) {
-			$tags[] = '<comment>'.$tagName.'</comment>';
+		foreach ($maxTags as $tagName => $length)
+		{
+			$tags[] = '<comment>' . $tagName . '</comment>';
 		}
-		$output->writeln(vsprintf($format1, $this->buildArgumentsArray('<comment>Service Id</comment>', '<comment>Scope</comment>', '<comment>Class Name</comment>', $tags)));
+		$output->writeln(vsprintf($format1, $this->buildArgumentsArray('<comment>' . $this->user->lang('SERVICE_ID') . '</comment>', '<comment>' . $this->user->lang('SCOPE') . '</comment>', '<comment>' . $this->user->lang('CLASS_NAME') . '</comment>', $tags)));
 
-		foreach ($serviceIds as $serviceId) {
+		foreach ($serviceIds as $serviceId)
+		{
 			$definition = $this->resolveServiceDefinition($serviceId);
 
-			if ($definition instanceof Definition) {
+			if ($definition instanceof Definition)
+			{
 				$lines = array();
-				if (null !== $showTagAttributes) {
-					foreach ($definition->getTag($showTagAttributes) as $key => $tag) {
+				if (null !== $showTagAttributes)
+				{
+					foreach ($definition->getTag($showTagAttributes) as $key => $tag)
+					{
 						$tagValues = array();
-						foreach (array_keys($maxTags) as $tagName) {
+						foreach (array_keys($maxTags) as $tagName)
+						{
 							$tagValues[] = isset($tag[$tagName]) ? $tag[$tagName] : "";
 						}
-						if (0 === $key) {
+						if (0 === $key)
+						{
 							$lines[] = $this->buildArgumentsArray($serviceId, $definition->getScope(), $definition->getClass(), $tagValues);
-						} else {
+						}
+						else
+						{
 							$lines[] = $this->buildArgumentsArray(' "', '', '', $tagValues);
 						}
 					}
-				} else {
+				}
+				else
+				{
 					$lines[] = $this->buildArgumentsArray($serviceId, $definition->getScope(), $definition->getClass());
 				}
 
-				foreach ($lines as $arguments) {
+				foreach ($lines as $arguments)
+				{
 					$output->writeln(vsprintf($format, $arguments));
 				}
-			} elseif ($definition instanceof Alias) {
+			}
+			elseif ($definition instanceof Alias)
+			{
 				$alias = $definition;
-				$output->writeln(vsprintf($format, $this->buildArgumentsArray($serviceId, 'n/a', sprintf('<comment>alias for</comment> <info>%s</info>', (string) $alias), count($maxTags) ? array_fill(0, count($maxTags), "") : array())));
-			} else {
+				$output->writeln(vsprintf($format, $this->buildArgumentsArray($serviceId, 'n/a', sprintf('<comment>' . $this->user->lang('ALIAS_FOR') . '</comment> <info>%s</info>', (string) $alias), count($maxTags) ? array_fill(0, count($maxTags), "") : array())));
+			}
+			else
+			{
 				// we have no information (happens with "service_container")
 				$service = $definition;
 				$output->writeln(vsprintf($format, $this->buildArgumentsArray($serviceId, '', get_class($service), count($maxTags) ? array_fill(0, count($maxTags), "") : array())));
@@ -300,7 +320,8 @@ EOF
 	protected function buildArgumentsArray($serviceId, $scope, $className, array $tagAttributes = array())
 	{
 		$arguments = array($serviceId);
-		foreach ($tagAttributes as $tagAttribute) {
+		foreach ($tagAttributes as $tagAttribute)
+		{
 			$arguments[] = $tagAttribute;
 		}
 		$arguments[] = $scope;
@@ -316,85 +337,133 @@ EOF
 	{
 		$definition = $this->resolveServiceDefinition($serviceId);
 
-		$label = sprintf('Information for service <info>%s</info>', $serviceId);
+		$label = $this->user->lang('NICOFUMA_DEBUGTOOLS_CLI_CONTAINER_LABEL_INFO_SERVICE', $serviceId);
 		$output->writeln($this->getHelper('formatter')->formatSection('container', $label));
 		$output->writeln('');
 
-		if ($definition instanceof Definition) {
-			$output->writeln(sprintf('<comment>Service Id</comment> %s', $serviceId));
-			$output->writeln(sprintf('<comment>Class</comment> %s', $definition->getClass() ?: "-"));
+		if ($definition instanceof Definition)
+		{
+			$output->writeln(sprintf('<comment>' . $this->user->lang('SERVICE_ID') . '</comment> %s', $serviceId));
+			$output->writeln(sprintf('<comment>' . $this->user->lang('CLASS') . '</comment> %s', $definition->getClass() ? : "-"));
+
+			$arguments = $definition->getArguments();
+			if (count($arguments))
+			{
+				$output->writeln('<comment>' . $this->user->lang('ARGUMENTS') . '</comment>');
+				foreach ($arguments as $argument)
+				{
+					if ($argument instanceof Reference)
+					{
+						$output->writeln(' - @' . $argument);
+					}
+					else
+					{
+						$parameter = $this->resolve_parameter($argument);
+						if ($parameter !== false)
+						{
+							$output->writeln(sprintf(' - %-30s (%s)', '%' . $parameter . '%', $argument));
+						}
+						else
+						{
+							$output->writeln(' - ' . $argument);
+						}
+					}
+				}
+			}
+			else
+			{
+				$output->writeln('<comment>' . $this->user->lang('ARGUMENTS') . '</comment> -');
+			}
 
 			$tags = $definition->getTags();
-			if (count($tags)) {
-				$output->writeln('<comment>Tags</comment>');
-				foreach ($tags as $tagName => $tagData) {
-					foreach ($tagData as $singleTagData) {
-						$output->writeln(sprintf(' - %-30s (%s)', $tagName, implode(', ', array_map(function ($key, $value) {
+			if (count($tags))
+			{
+				$output->writeln('<comment>' . $this->user->lang('TAGS') . '</comment>');
+				foreach ($tags as $tagName => $tagData)
+				{
+					foreach ($tagData as $singleTagData)
+					{
+						$output->writeln(sprintf(' - %-30s (%s)', $tagName, implode(', ', array_map(function ($key, $value)
+						{
 							return sprintf('<info>%s</info>: %s', $key, $value);
 						}, array_keys($singleTagData), array_values($singleTagData)))));
 					}
 				}
-			} else {
-				$output->writeln('<comment>Tags</comment> -');
+			}
+			else
+			{
+				$output->writeln('<comment>' . $this->user->lang('TAGS') . '</comment> -');
 			}
 
-			$output->writeln(sprintf('<comment>Scope</comment> %s', $definition->getScope()));
+			$output->writeln(sprintf('<comment>' . $this->user->lang('SCOPE') . '</comment> %s', $definition->getScope()));
 
 			$public = $definition->isPublic() ? 'yes' : 'no';
-			$output->writeln(sprintf('<comment>Public</comment> %s', $public));
+			$output->writeln(sprintf('<comment>' . $this->user->lang('PUBLIC') . '</comment> %s', $public));
 
 			$synthetic = $definition->isSynthetic() ? 'yes' : 'no';
-			$output->writeln(sprintf('<comment>Synthetic</comment> %s', $synthetic));
+			$output->writeln(sprintf('<comment>' . $this->user->lang('SYNTHETIC') . '</comment> %s', $synthetic));
 
 			$file = $definition->getFile() ? $definition->getFile() : '-';
-			$output->writeln(sprintf('<comment>Required File</comment> %s', $file));
-		} elseif ($definition instanceof Alias) {
+			$output->writeln(sprintf('<comment>' . $this->user->lang('REQUIRED_FILE') . '</comment> %s', $file));
+		}
+		elseif ($definition instanceof Alias)
+		{
 			$alias = $definition;
-			$output->writeln(sprintf('This service is an alias for the service <info>%s</info>', (string) $alias));
-		} else {
+			$output->writeln($this->user->lang('NICOFUMA_DEBUGTOOLS_CLI_CONTAINER_SERVICE_ALIAS_FOR', (string) $alias));
+		}
+		else
+		{
 			// edge case (but true for "service_container", all we have is the service itself
 			$service = $definition;
-			$output->writeln(sprintf('<comment>Service Id</comment> %s', $serviceId));
-			$output->writeln(sprintf('<comment>Class</comment> %s', get_class($service)));
+			$output->writeln(sprintf('<comment>' . $this->user->lang('SERVICE_ID') . '</comment> %s', $serviceId));
+			$output->writeln(sprintf('<comment>' . $this->user->lang('CLASS') . '</comment> %s', get_class($service)));
 		}
 	}
 
 	protected function outputParameters(OutputInterface $output, $parameters)
 	{
-		$output->writeln($this->getHelper('formatter')->formatSection('container', 'List of parameters'));
+		$output->writeln($this->getHelper('formatter')->formatSection('container', $this->user->lang('LIST_PARAMETERS')));
 
 		$terminalDimensions = $this->getApplication()->getTerminalDimensions();
-		$maxTerminalWidth = $terminalDimensions[0];
-		$maxParameterWidth = 0;
-		$maxValueWidth = 0;
+		$maxTerminalWidth   = $terminalDimensions[0];
+		$maxParameterWidth  = 0;
+		$maxValueWidth      = 0;
 
 		// Determine max parameter & value length
-		foreach ($parameters as $parameter => $value) {
+		foreach ($parameters as $parameter => $value)
+		{
 			$parameterWidth = strlen($parameter);
-			if ($parameterWidth > $maxParameterWidth) {
+			if ($parameterWidth > $maxParameterWidth)
+			{
 				$maxParameterWidth = $parameterWidth;
 			}
 
 			$valueWith = strlen($this->formatParameter($value));
-			if ($valueWith > $maxValueWidth) {
+			if ($valueWith > $maxValueWidth)
+			{
 				$maxValueWidth = $valueWith;
 			}
 		}
 
 		$maxValueWidth = min($maxValueWidth, $maxTerminalWidth - $maxParameterWidth - 1);
 
-		$formatTitle = '%-'.($maxParameterWidth + 19).'s %-'.($maxValueWidth + 19).'s';
-		$format = '%-'.$maxParameterWidth.'s %-'.$maxValueWidth.'s';
+		$formatTitle = '%-' . ($maxParameterWidth + 19) . 's %-' . ($maxValueWidth + 19) . 's';
+		$format      = '%-' . $maxParameterWidth . 's %-' . $maxValueWidth . 's';
 
-		$output->writeln(sprintf($formatTitle, '<comment>Parameter</comment>', '<comment>Value</comment>'));
+		$output->writeln(sprintf($formatTitle, '<comment>' . $this->user->lang('PARAMETER') . '</comment>', '<comment>' . $this->user->lang('VALUE') . '</comment>'));
 
-		foreach ($parameters as $parameter => $value) {
+		foreach ($parameters as $parameter => $value)
+		{
 			$splits = str_split($this->formatParameter($value), $maxValueWidth);
 
-			foreach ($splits as $index => $split) {
-				if (0 === $index) {
+			foreach ($splits as $index => $split)
+			{
+				if (0 === $index)
+				{
 					$output->writeln(sprintf($format, $parameter, $split));
-				} else {
+				}
+				else
+				{
 					$output->writeln(sprintf($format, ' ', $split));
 				}
 			}
@@ -428,12 +497,14 @@ EOF
 	*/
 	protected function resolveServiceDefinition($serviceId)
 	{
-		if ($this->containerBuilder->hasDefinition($serviceId)) {
+		if ($this->containerBuilder->hasDefinition($serviceId))
+		{
 			return $this->containerBuilder->getDefinition($serviceId);
 		}
 
 		// Some service IDs don't have a Definition, they're simply an Alias
-		if ($this->containerBuilder->hasAlias($serviceId)) {
+		if ($this->containerBuilder->hasAlias($serviceId))
+		{
 			return $this->containerBuilder->getAlias($serviceId);
 		}
 
@@ -442,39 +513,64 @@ EOF
 	}
 
 	/**
+	* Given a parameter value, this returns the corresponding parameter if it exists, false otherwise.
+	*
+	* @param $parameter
+	* @return bool|string
+	*/
+	protected function resolve_parameter($parameter)
+	{
+		foreach ($this->containerBuilder->getParameterBag()->all() as $key => $value)
+		{
+			if ($parameter === $value)
+			{
+				return $key;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	* Renders list of tagged services grouped by tag
 	*
 	* @param OutputInterface $output
-	* @param bool $showPrivate
+	* @param bool            $showPrivate
 	*/
 	protected function outputTags(OutputInterface $output, $showPrivate = false)
 	{
 		$tags = $this->containerBuilder->findTags();
 		asort($tags);
 
-		$label = 'Tagged services';
+		$label = $this->user->lang('TAGGED_SERVICES');
 		$output->writeln($this->getHelper('formatter')->formatSection('container', $label));
 
-		foreach ($tags as $tag) {
+		foreach ($tags as $tag)
+		{
 			$serviceIds = $this->containerBuilder->findTaggedServiceIds($tag);
 
-			foreach ($serviceIds as $serviceId => $attributes) {
+			foreach ($serviceIds as $serviceId => $attributes)
+			{
 				$definition = $this->resolveServiceDefinition($serviceId);
-				if ($definition instanceof Definition) {
-					if (!$showPrivate && !$definition->isPublic()) {
+				if ($definition instanceof Definition)
+				{
+					if (!$showPrivate && !$definition->isPublic())
+					{
 						unset($serviceIds[$serviceId]);
 						continue;
 					}
 				}
 			}
 
-			if (count($serviceIds) === 0) {
+			if (count($serviceIds) === 0)
+			{
 				continue;
 			}
 
 			$output->writeln($this->getHelper('formatter')->formatSection('tag', $tag));
 
-			foreach ($serviceIds as $serviceId => $attributes) {
+			foreach ($serviceIds as $serviceId => $attributes)
+			{
 				$output->writeln($serviceId);
 			}
 
@@ -484,7 +580,8 @@ EOF
 
 	protected function formatParameter($value)
 	{
-		if (is_bool($value) || is_array($value) || (null === $value)) {
+		if (is_bool($value) || is_array($value) || (null === $value))
+		{
 			return json_encode($value);
 		}
 
