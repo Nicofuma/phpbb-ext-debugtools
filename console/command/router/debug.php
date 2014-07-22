@@ -32,11 +32,6 @@ class debug extends \phpbb\console\command\command
 	protected $controller_provider;
 
 	/**
-	* @var \phpbb\user
-	*/
-	protected $user;
-
-	/**
 	* Constructor
 	*
 	* @param \phpbb\user                $user                User instance
@@ -44,12 +39,11 @@ class debug extends \phpbb\console\command\command
 	*/
 	function __construct(\phpbb\user $user, \phpbb\controller\provider $controller_provider)
 	{
-		$this->user					= $user;
 		$this->controller_provider	= $controller_provider;
 
 		$user->add_lang_ext('nicofuma/debugtools', 'cli');
 
-		parent::__construct();
+		parent::__construct($user);
 	}
 
 	/**

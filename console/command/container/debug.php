@@ -51,11 +51,6 @@ class debug extends \phpbb\console\command\command
 	protected $php_ext;
 
 	/**
-	* @var \phpbb\user
-	*/
-	protected $user;
-
-	/**
 	* Constructor
 	*
 	* @param \phpbb\user			$user				User instance
@@ -68,11 +63,10 @@ class debug extends \phpbb\console\command\command
 		$this->config_php_file	= $config_php_file;
 		$this->phpbb_root_path	= $phpbb_root_path;
 		$this->php_ext			= $php_ext;
-		$this->user				= $user;
 
 		$user->add_lang_ext('nicofuma/debugtools', 'cli');
 
-		parent::__construct();
+		parent::__construct($user);
 	}
 
 	/**

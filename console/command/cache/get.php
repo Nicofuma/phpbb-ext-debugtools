@@ -18,11 +18,10 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class get extends \phpbb\console\command\command
 {
-	/** @var \phpbb\cache\driver\driver_interface */
+	/**
+	* @var \phpbb\cache\driver\driver_interface
+	*/
 	protected $cache;
-
-	/** @var \phpbb\user */
-	protected $user;
 	/**
 	* Constructor
 	*
@@ -32,11 +31,10 @@ class get extends \phpbb\console\command\command
 	public function __construct(\phpbb\user $user, \phpbb\cache\driver\driver_interface $cache)
 	{
 		$this->cache = $cache;
-		$this->user = $user;
 
 		$user->add_lang_ext('nicofuma/debugtools', 'cli');
 
-		parent::__construct();
+		parent::__construct($user);
 	}
 
 	/**
