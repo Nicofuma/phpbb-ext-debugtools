@@ -32,14 +32,28 @@ class debug extends \phpbb\console\command\command
 	protected $controller_provider;
 
 	/**
+	* @var \phpbb\controller\provider
+	*/
+	protected $extension_manager;
+
+	/**
+	* @var \phpbb\controller\provider
+	*/
+	protected $phpbb_root_path;
+
+	/**
 	* Constructor
 	*
 	* @param \phpbb\user                $user                User instance
 	* @param \phpbb\controller\provider $controller_provider User instance
+	* @param \phpbb\extension\manager   $extension_manager   Extension manager object
+	* @param string                     $phpbb_root_path     phpBB root path
 	*/
-	function __construct(\phpbb\user $user, \phpbb\controller\provider $controller_provider)
+	function __construct(\phpbb\user $user, \phpbb\controller\provider $controller_provider, \phpbb\extension\manager $extension_manager, $phpbb_root_path)
 	{
 		$this->controller_provider	= $controller_provider;
+		$this->extension_manager	= $extension_manager;
+		$this->phpbb_root_path		= $phpbb_root_path;
 
 		$user->add_lang_ext('nicofuma/debugtools', 'cli');
 
@@ -68,6 +82,9 @@ class debug extends \phpbb\console\command\command
 	protected function execute(InputInterface $input, OutputInterface $output)
 	{
 		$name = $input->getArgument('name');
+
+		$this->controller_provider->find_routing_files($this->extension_manager->get_finder());
+		$this->controller_provider->find($this->phpbb_root_path)->get_routes();
 
 		if ($name)
 		{
