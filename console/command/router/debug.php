@@ -66,7 +66,7 @@ class debug extends \phpbb\console\command\command
 	protected function configure()
 	{
 		$this
-			->setName('router:debug')
+			->setName('debug:router')
 			->setDefinition(array(
 				new InputArgument('name', InputArgument::OPTIONAL, $this->user->lang('NICOFUMA_DEBUGTOOLS_CLI_ARGUMENT_ROUTE_NAME')),
 			))

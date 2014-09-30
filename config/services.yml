@@ -26,3 +26,11 @@ services:
             - %core.root_path%
         tags:
             - { name: console.command }
+
+    nicofuma.debugtools.console.command.twig.lint:
+        class: nicofuma\debugtools\console\command\twig\lint
+        arguments:
+            - @user
+            - @template.twig.environment
+        tags:
+            - { name: console.command }
