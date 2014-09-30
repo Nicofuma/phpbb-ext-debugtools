@@ -20,7 +20,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -31,7 +30,7 @@ use Symfony\Component\DependencyInjection\Reference;
 class debug extends \phpbb\console\command\command
 {
 	/**
-	* @var ContainerBuilder|null
+	* @var \Symfony\Component\DependencyInjection\ContainerBuilder|null
 	*/
 	protected $containerBuilder;
 
@@ -168,7 +167,7 @@ class debug extends \phpbb\console\command\command
 		{
 			throw new \InvalidArgumentException($this->user->lang('NICOFUMA_DEBUGTOOLS_CLI_EXCEPTION_CONTAINER_DEBUG_INCOMPATIBLE_OPTIONS_ARGUMENTS'));
 		}
-		elseif ((null === $name) && $optionsCount > 1)
+		else if ((null === $name) && $optionsCount > 1)
 		{
 			throw new \InvalidArgumentException($this->user->lang('NICOFUMA_DEBUGTOOLS_CLI_EXCEPTION_CONTAINER_DEBUG_INCOMPATIBLE_OPTIONS'));
 		}
@@ -297,7 +296,7 @@ class debug extends \phpbb\console\command\command
 					$output->writeln(vsprintf($format, $arguments));
 				}
 			}
-			elseif ($definition instanceof Alias)
+			else if ($definition instanceof Alias)
 			{
 				$alias = $definition;
 				$output->writeln(vsprintf($format, $this->buildArgumentsArray($serviceId, 'n/a', sprintf('<comment>' . $this->user->lang('ALIAS_FOR') . '</comment> <info>%s</info>', (string) $alias), count($maxTags) ? array_fill(0, count($maxTags), "") : array())));
@@ -400,7 +399,7 @@ class debug extends \phpbb\console\command\command
 			$file = $definition->getFile() ? $definition->getFile() : '-';
 			$output->writeln(sprintf('<comment>' . $this->user->lang('REQUIRED_FILE') . '</comment> %s', $file));
 		}
-		elseif ($definition instanceof Alias)
+		else if ($definition instanceof Alias)
 		{
 			$alias = $definition;
 			$output->writeln($this->user->lang('NICOFUMA_DEBUGTOOLS_CLI_CONTAINER_SERVICE_ALIAS_FOR', (string) $alias));
@@ -467,7 +466,7 @@ class debug extends \phpbb\console\command\command
 	/**
 	* Loads the ContainerBuilder from the cache.
 	*
-	* @return ContainerBuilder
+	* @return \Symfony\Component\DependencyInjection\ContainerBuilder
 	*
 	* @throws \LogicException
 	*/
