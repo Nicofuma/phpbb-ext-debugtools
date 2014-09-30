@@ -75,7 +75,7 @@ class debug extends \phpbb\console\command\command
 	protected function configure()
 	{
 		$this
-			->setName('container:debug')
+			->setName('debug:container')
 			->setDefinition(array(
 				new InputArgument('name', InputArgument::OPTIONAL, $this->user->lang('NICOFUMA_DEBUGTOOLS_CLI_ARGUMENT_SERVICE_NAME')),
 				new InputOption('show-private', null, InputOption::VALUE_NONE, $this->user->lang('NICOFUMA_DEBUGTOOLS_CLI_OPTION_CONTAINER_SHOW_PRIVATE')),
