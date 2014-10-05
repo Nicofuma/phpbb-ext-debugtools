@@ -34,3 +34,11 @@ services:
             - @template.twig.environment
         tags:
             - { name: console.command }
+
+    nicofuma.debugtools.console.command.twig.transform:
+        class: nicofuma\debugtools\console\command\twig\transform
+        arguments:
+            - @user
+            - @template.twig.environment
+        tags:
+            - { name: console.command }
