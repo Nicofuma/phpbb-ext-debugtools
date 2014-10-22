@@ -3,7 +3,7 @@
 	"type": "phpbb-extension",
 	"description": "Additional debug tools for phpBB.",
 	"homepage": "https://www.phpbb.com",
-	"version": "1.0.1",
+	"version": "1.0.2-dev",
 	"keywords": ["phpbb", "extension", "debug"],
 	"license": "GPL-2.0",
 	"authors": [
